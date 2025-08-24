@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viral Lab+ (Classic)</title>
+  <style>
+    :root { --bg1:#0b132c; --bg2:#0b132c; --card:#0b132ccc; --text:#e5e7eb; --accent:#22c55e; --border:#ffffff22; --muted:#94a3b8; --ring:#f59e0b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: var(--text); background: radial-gradient(900px 600px at 0% -10%,#11182766,transparent), linear-gradient(135deg, var(--bg1), var(--bg2)); min-height: 100vh; display:flex; flex-direction:column; }
+    header, footer { padding: 12px 16px; }
+    header { display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    h1 { margin:0; font-size:22px; font-weight:800; letter-spacing:.3px }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    .pill { background:#0ea5e980; color:#e0f2fe; padding:6px 10px; border-radius:999px; font-size:12px; box-shadow:0 0 0 1px #7dd3fc33 inset,0 2px 6px #0003; position:relative; overflow:hidden; }
+    .pill.timer::after{ content:""; position:absolute; inset:0; border-radius:999px; box-shadow:0 0 0 1px #ffffff22 inset; pointer-events:none; }
+    .btn { padding:8px 12px; border-radius:14px; border:1px solid var(--border); background:#ffffff10; cursor:pointer; font-size:14px; line-height:1; font-weight:700; display:inline-flex; align-items:center; gap:6px; color: var(--text); }
+    .btn:hover{ background:#ffffff18 }
+    .btn.primary { background:#22c55e22; border-color:#22c55e66 }
+    .switch { padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#111827; color:#e5e7eb; font-weight:700; line-height:1 }
+    main { width:100%; max-width:1260px; margin:0 auto; padding:12px 16px; display:grid; grid-template-columns:1fr; gap:16px; }
+    @media(min-width:1024px){ main{ grid-template-columns: 1fr 1fr 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 12px; box-shadow: 0 8px 20px #0006, 0 0 0 1px #ffffff08 inset; backdrop-filter: blur(6px); }
+    .title { font-weight:800; margin-bottom:8px; font-size:14px; letter-spacing:.2px }
+    .center { text-align:center; }
+    .big { font-size:40px; font-weight:800; }
+    .cookie { width:260px; height:260px; border-radius:50%; border:6px solid var(--accent); background: radial-gradient(circle at 35% 35%, #16a34a 0%, #065f46 60%, #052e16 100%); display:grid; place-items:center; margin:0 auto; box-shadow:0 20px 40px #0008, 0 0 30px #16a34a inset; cursor:pointer; position:relative; transition: transform .08s ease; }
+    .cookie:active { transform: scale(.96); }
+    .tag { position:absolute; right: 10px; bottom: 8px; font-size:12px; background:#111827cc; color:#a7f3d0; padding:2px 6px; border-radius:999px; box-shadow:0 0 0 1px #10b98155 inset }
+    .shop-item { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; border-radius:16px; background:#ffffff08; border:1px solid var(--border); box-shadow:0 4px 10px #0005; cursor:pointer; }
+    .shop-item.disabled { opacity:.55; cursor:not-allowed; }
+    .achv, .quest, .score { display:flex; gap:8px; align-items:center; padding:10px; border-radius:16px; background:#ffffff06; border:1px solid var(--border); box-shadow:0 4px 10px #0005; }
+    .muted { opacity:.8; font-size:12px; color:var(--muted) }
+    .ach-item.locked { opacity:.55; }
+    /* badges & purchased visuals */
+    .badge{ margin-left:8px; font-size:10px; padding:2px 6px; border-radius:999px; background:#10b98122; border:1px solid #34d39966; color:#d1fae5 }
+    .shop-item.purchased{ background:#ffffff05; }
+    /* bought flash */
+    @keyframes flashGlow{ 0%{box-shadow:0 0 0 0 #10b98155, inset 0 0 0 1px #34d399} 50%{box-shadow:0 0 0 10px #10b98122, inset 0 0 0 1px #34d399} 100%{box-shadow:0 0 0 0 #10b98100, inset 0 0 0 1px var(--border)} }
+    .boughtFlash{ animation: flashGlow 0.9s ease-out 1 }
+    /* toast */
+    .toast{ position:fixed; right:16px; top:16px; background:#10b981; color:#052e16; border:1px solid #34d399; border-radius:12px; padding:10px 12px; box-shadow:0 10px 24px #0008; font-weight:800; opacity:0; transform:translateY(-8px); animation:toastIn .18s ease-out forwards; z-index:50 }
+    .toast.out{ animation:toastOut .22s ease-in forwards }
+    @keyframes toastIn{ to{ opacity:1; transform:translateY(0) } }
+    @keyframes toastOut{ to{ opacity:0; transform:translateY(-8px) } }
+    /* shake */
+    @keyframes shake{ 10%,90%{transform:translateX(-1px)} 20%,80%{transform:translateX(2px)} 30%,50%,70%{transform:translateX(-4px)} 40%,60%{transform:translateX(4px)} }
+    .shake{ animation:shake .35s both }
+    /* floating number */
+    .float { position:fixed; transform:translate(-50%,-50%); font-weight:800; color:#a7f3d0; text-shadow:0 2px 6px #0009; animation:floatUp .7s ease-out forwards; }
+    @keyframes floatUp { from{opacity:1; transform:translate(-50%,-50%) translateY(0)} to{opacity:0; transform:translate(-50%,-50%) translateY(-28px)} }
+    /* golden event button */
+    .golden { position: fixed; z-index: 10; padding:8px 12px; border-radius:14px; border:1px solid #fbbf24; background:#f59e0b; color:#111827; box-shadow:0 6px 16px #0006; cursor: pointer; font-weight:800; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🦠 Viral Lab+</h1>
+    <div class="row">
+      <span id="cpsPill" class="pill">VPS: 0.0</span>
+      <span id="buffPill" class="pill timer" style="display:none">Buff</span>
+      <button id="resetBtn" type="button" class="btn primary">Sıfırla</button>
+      <button id="prestigeBtn" class="btn" title="Prestij (kalıcı çarpan)" style="display:none">Prestij</button>
+      <button id="exportBtn" class="btn">Dışa Aktar</button>
+      <label class="btn" for="importInput">İçe Aktar</label>
+      <input id="importInput" type="file" accept="application/json" style="display:none" />
+      <button id="langBtn" class="switch" title="Dil">TR/EN</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card center">
+      <div id="labelCookies">Viral Yük</div>
+      <div id="cookies" class="big">0</div>
+      <div id="total" class="muted">Toplam: 0</div>
+      <div style="height: 12px;"></div>
+      <div id="cookieBtn" class="cookie" aria-label="Virion" role="button" tabindex="0">
+        <div style="font-size: 88px;">🦠</div>
+        <div id="clickTag" class="tag">+1 / bulaş</div>
+      </div>
+      <div id="stats" class="row" style="margin-top:8px; justify-content:center">
+        <div class="muted">Toplam tıklama: <b id="statClicks">0</b></div>
+        <div class="muted">•</div>
+        <div class="muted">Mutasyon: <b id="statGold">0</b></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="title" id="labelProduction">Üretim</div>
+      <div id="shop"></div>
+    </section>
+
+    <section class="card">
+      <div class="title" id="labelClickUps">Tıklama Yükseltmeleri</div>
+      <div id="clickShop"></div>
+      <div class="title" style="margin-top:12px" id="labelQuests">Görevler</div>
+      <div id="quests"></div>
+      <div class="title" style="margin-top:12px" id="labelAchievements">Başarımlar</div>
+      <div id="achievements"></div>
+    </section>
+  </main>
+
+  <footer class="center muted">Viral Lab+ • Tek dosya • LocalStorage • Gece modu</footer>
+
+  <canvas id="bgCanvas" style="position:fixed;inset:0;z-index:-1"></canvas>
+
+  <script>
+    // ===== I18N & STORAGE =====
+    const STORAGE_KEY = 'viral-lab-classic-v7-fix';
+    const I18N = { 
+      tr: { cookies:'Viral Yük', total:'Toplam', production:'Üretim', clickUps:'Bulaş Yükseltmeleri', quests:'Görevler', ach:'Başarımlar', reset:'Sıfırla', prestige:'Evrim', confirmReset:'Tüm ilerleme silinsin mi?', confirmPrestige:'Evrim geçirip sıfırlansın mı? Kalıcı çarpan kazanacaksınız.' }, 
+      en: { cookies:'Viral Load', total:'Total', production:'Production', clickUps:'Spread Upgrades', quests:'Quests', ach:'Achievements', reset:'Reset', prestige:'Evolve', confirmReset:'Delete all progress?', confirmPrestige:"Evolve and reset? You'll gain a permanent multiplier." } 
+    };
+
+    // ===== ECONOMY =====
+    const BASE_UPGRADES = [
+      { id: 'cursor', name: 'Virion', desc: 'Saniyede 0.09 viral yük.', baseCost: 20, baseCps: 0.09, icon: '🦠' },
+      { id: 'grandma', name: 'Konak Hücre', desc: 'Saniyede 0.95 viral yük.', baseCost: 120, baseCps: 0.95, icon: '🧬' },
+      { id: 'farm', name: 'Toplu Taşıma', desc: 'Saniyede 7.8 viral yük.', baseCost: 1200, baseCps: 7.8, icon: '🚌' },
+      { id: 'factory', name: 'Biyoreaktör', desc: 'Saniyede 46 viral yük.', baseCost: 14000, baseCps: 46, icon: '⚗️' },
+      { id: 'mine', name: 'Aerosol Üretimi', desc: 'Saniyede 255 viral yük.', baseCost: 130000, baseCps: 255, icon: '💨' },
+      { id: 'bank', name: 'Küresel Salgın Ağı', desc: 'Saniyede 1.4K viral yük.', baseCost: 1500000, baseCps: 1400, icon: '🌐' },
+      { id: 'lab', name: 'Mutasyon Laboratuvarı', desc: 'Saniyede 7.6K viral yük.', baseCost: 20000000, baseCps: 7600, icon: '🧪' },
+      { id: 'airport', name: 'Havalimanı Düğümleri', desc: 'Saniyede 39K viral yük.', baseCost: 260000000, baseCps: 39000, icon: '✈️' },
+      { id: 'social', name: 'Sosyal Ağ Viralitesi', desc: 'Saniyede 190K viral yük.', baseCost: 3000000000, baseCps: 190000, icon: '📣' },
+      { id: 'megacity', name: 'Megakent Yayılımı', desc: 'Saniyede 900K viral yük.', baseCost: 35000000000, baseCps: 900000, icon: '🏙️' },
+      { id: 'seafreight', name: 'Deniz Ticareti', desc: 'Saniyede 4.2M viral yük.', baseCost: 400000000000, baseCps: 4200000, icon: '🚢' },
+      { id: 'wildlife', name: 'Yaban Rezervuarı', desc: 'Saniyede 18M viral yük.', baseCost: 4500000000000, baseCps: 18000000, icon: '🐀' },
+      { id: 'vector', name: 'Vektör Sürüler', desc: 'Saniyede 82M viral yük.', baseCost: 50000000000000, baseCps: 82000000, icon: '🦟' },
+      { id: 'nanobot', name: 'Nano-Kopyacılar', desc: 'Saniyede 360M viral yük.', baseCost: 600000000000000, baseCps: 360000000, icon: '🤖' },
+      { id: 'quantum', name: 'Kuantum Replikasyon', desc: 'Saniyede 1.7B viral yük.', baseCost: 7000000000000000, baseCps: 1700000000, icon: '⚛️' },
+      { id: 'galactic', name: 'Galaktik Toz', desc: 'Saniyede 7.6B viral yük.', baseCost: 80000000000000000, baseCps: 7600000000, icon: '🌌' },
+      { id: 'biosphere', name: 'Sentetik Biyosfer', desc: 'Saniyede 32B viral yük.', baseCost: 900000000000000000, baseCps: 32000000000, icon: '🧫' },
+      { id: 'wormhole', name: 'Solucan Deliği Lojistiği', desc: 'Saniyede 170B viral yük.', baseCost: 12000000000000000000, baseCps: 170000000000, icon: '🌀' },
+      { id: 'mainframe', name: 'Dünya Ana Ağı', desc: 'Saniyede 780B viral yük.', baseCost: 150000000000000000000, baseCps: 780000000000, icon: '🖥️' },
+      { id: 'singularity', name: 'Tekillik Çoğaltıcı', desc: 'Saniyede 3.6T viral yük.', baseCost: 2000000000000000000000, baseCps: 3600000000000, icon: '🕳️' },
+    ];
+
+    const CLICK_UPGRADES = [
+      { id:'handmade1', name:'Protein Kılıfı', desc:'+1 bulaş gücü', baseCost:110, clickAdd:1 },
+      { id:'silicon_spatula', name:'Glikoprotein Dikenleri', desc:'+5 bulaş gücü', baseCost:1300, clickAdd:5 },
+      { id:'golden_butter', name:'Konak Reseptör Adaptörü', desc:'+25 bulaş gücü', baseCost:9500, clickAdd:25 },
+      { id:'chef_hat', name:'Yüksek Bulaşıcılık', desc:'+100 bulaş gücü', baseCost:280000, clickAdd:100 },
+      { id:'airborne_protocol', name:'Hava Yoluyla Protokol', desc:'+250 bulaş gücü', baseCost:2800000, clickAdd:250 },
+      { id:'superspreader', name:'Süper Yayılım', desc:'+500 bulaş gücü', baseCost:28000000, clickAdd:500 },
+      { id:'immune_evasion', name:'Bağışıklık Kaçışı', desc:'+1000 bulaş gücü', baseCost:280000000, clickAdd:1000 },
+      { id:'host_switch', name:'Konak Değişimi', desc:'+2500 bulaş gücü', baseCost:5500000000, clickAdd:2500 },
+      { id:'antiviral_resistance', name:'Antiviral Direnci', desc:'+5000 bulaş gücü', baseCost:95000000000, clickAdd:5000 },
+      { id:'hypermutation', name:'Hiper-Mutasyon', desc:'+10000 bulaş gücü', baseCost:1600000000000, clickAdd:10000 },
+      { id:'tropism', name:'Doku Tropizmi', desc:'+20000 bulaş gücü', baseCost:6500000000000, clickAdd:20000 },
+      { id:'capsid_overclock', name:'Kapsid Hız Aşırtma', desc:'+50000 bulaş gücü', baseCost:25000000000000, clickAdd:50000 },
+      { id:'quantum_binding', name:'Kuantum Bağlanma', desc:'+150000 bulaş gücü', baseCost:150000000000000, clickAdd:150000 },
+      { id:'galactic_signal', name:'Galaktik Sinyal', desc:'+500000 bulaş gücü', baseCost:600000000000000, clickAdd:500000 },
+    ];
+
+    const SYNERGIES = [
+      { cond: o => (o.grandma||0) >= 10, apply: cps => cps * 1.1, label: 'Konak kümesi (+%10 VPS)' },
+      { cond: o => (o.farm||0) >= 10 && (o.factory||0) >= 5, apply: cps => cps * 1.15, label: 'Taşıma+Biyoreaktör (+%15 VPS)' },
+      { cond: o => (o.airport||0) >= 5 && (o.social||0) >= 5, apply: cps => cps * 1.10, label: 'Ağ Etkisi (+%10 VPS)' },
+      { cond: o => (o.wildlife||0) >= 3 && (o.vector||0) >= 3, apply: cps => cps * 1.20, label: 'Doğa Köprüsü (+%20 VPS)' },
+      { cond: o => (o.lab||0) >= 1 && (o.factory||0) >= 1, apply: cps => cps * 1.08, label: 'Ar-Ge Zinciri (+%8 VPS)' },
+      { cond: o => (o.quantum||0) >= 2 && (o.nanobot||0) >= 2, apply: cps => cps * 1.10, label: 'Kuantum-Nano (+%10 VPS)' },
+      { cond: o => (o.galactic||0) >= 1 && (o.wormhole||0) >= 1, apply: cps => cps * 1.12, label: 'Kozmik Lojistik (+%12 VPS)' },
+    ];
+
+    // ===== Quests & Achievements =====
+    const QUESTS_DEF = [
+      { id:'q1', name:'1.000 viral yüke ulaş',  done:s=> s.totalCookies>=1000, rewardDesc:'+2 bulaş gücü', reward:()=>{ state.clickPower+=2; } },
+      { id:'q2', name:'Mutasyonu 3 kez yakala', done:s=> s.stats.gold>=3, rewardDesc:'x1.10 kalıcı VPS', reward:()=>{ state.permMult*=1.10; } },
+      { id:'q3', name:'Toplam 10 üretici edin', done:s=> sumOwned(s.owned)>=10, rewardDesc:'+10 bulaş gücü', reward:()=>{ state.clickPower+=10; } },
+      { id:'q4', name:'1M toplam viral yüke ulaş', done:s=> s.totalCookies>=1_000_000, rewardDesc:'x1.05 kalıcı VPS', reward:()=>{ state.permMult*=1.05; } },
+    ];
+
+    const ACHIEVEMENTS_DEF = [
+      { id:'a1',  name:'Mikro Başlangıç',        desc:'Toplam 100 viral yük',       done:s=> s.totalCookies>=100 },
+      { id:'a2',  name:'İlk Bin',                desc:'Toplam 1.000 viral yük',     done:s=> s.totalCookies>=1_000 },
+      { id:'a3',  name:'Bulaş Uzmanı',           desc:'Toplam 10.000 viral yük',    done:s=> s.totalCookies>=10_000 },
+      { id:'a4',  name:'Salgın Eşiği',           desc:'Toplam 100.000 viral yük',   done:s=> s.totalCookies>=100_000 },
+      { id:'a5',  name:'Salgın',                 desc:'Toplam 1.000.000 viral yük', done:s=> s.totalCookies>=1_000_000 },
+      { id:'a6',  name:'Pandemi',                desc:'Toplam 10.000.000 viral yük',done:s=> s.totalCookies>=10_000_000 },
+      { id:'a7',  name:'Küresel Dalga',          desc:'Toplam 100.000.000 viral yük',done:s=> s.totalCookies>=100_000_000 },
+      { id:'a8',  name:'Üstel Büyüme',           desc:'Toplam 1.000.000.000 viral yük',done:s=> s.totalCookies>=1_000_000_000 },
+      { id:'a9',  name:'Sınır Ötesi',            desc:'Toplam 10.000.000.000 viral yük',done:s=> s.totalCookies>=10_000_000_000 },
+      { id:'a10', name:'Parmak Isındırma',       desc:'100 tıklama',                done:s=> (s.stats.clicks||0)>=100 },
+      { id:'a11', name:'Maraton',                desc:'1.000 tıklama',              done:s=> (s.stats.clicks||0)>=1_000 },
+      { id:'a12', name:'Dayanıklılık',           desc:'10.000 tıklama',             done:s=> (s.stats.clicks||0)>=10_000 },
+      { id:'a32', name:'Hat Açılıyor',           desc:'Toplam 10 üretici',          done:s=> sumOwned(s.owned) >= 10 },
+      { id:'a33', name:'Hat Büyüyor',            desc:'Toplam 50 üretici',          done:s=> sumOwned(s.owned) >= 50 },
+      { id:'a43', name:'İleri Dalga',            desc:'Toplam 100M viral yük',      done:s=> s.totalCookies>=100_000_000 },
+      { id:'a44', name:'Büyük Dalga',            desc:'Toplam 1B viral yük',        done:s=> s.totalCookies>=1_000_000_000 },
+      { id:'a50', name:'Vektör Hakimiyeti',      desc:'10 Vektör Sürüler',          done:s=> (s.owned.vector||0) >= 10 },
+      { id:'a54', name:'Tekillik',               desc:'1 Tekillik Çoğaltıcı',       done:s=> (s.owned.singularity||0) >= 1 },
+    ];
+
+    // ===== STATE =====
+    let state = { cookies:0, totalCookies:0, clickPower:1, owned:{}, purchased:{}, savedAt:null, stats:{ clicks:0, gold:0 }, lang:'tr', prestige:{ sugar:0, mult:1 }, permMult:1, activeBuff:null, quests:{}, ui:{} };
+
+    // Buff settings
+    const BUFF_DURATION_MS = 20000; // 20 saniye
+    let isInteractingShop = false;
+
+    // ===== HELPERS =====
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    function showToast(text){ try{ const t=document.createElement('div'); t.className='toast'; t.textContent=text; document.body.appendChild(t); setTimeout(()=>t.classList.add('out'), 1400); setTimeout(()=>{ t.remove(); }, 1800); }catch(e){} }
+    const setText = (sel, txt) => { const el=$(sel); if(el) el.textContent = txt; };
+    const fmt = n => (n<1_000)? n.toFixed(0): (n<1_000_000)? (n/1_000).toFixed(2)+'K': (n<1_000_000_000)? (n/1_000_000).toFixed(2)+'M': (n<1_000_000_000_000)? (n/1_000_000_000).toFixed(2)+'B': (n/1_000_000_000_000).toFixed(2)+'T';
+    const sumOwned = (o)=> Object.values(o||{}).reduce((a,b)=>a+(b||0),0);
+    function gamePhase(){ const t=state.totalCookies; if(t < 50_000) return 'early'; if(t < 50_000_000) return 'mid'; return 'late'; }
+
+    const scaleBase = (base, count) => Math.floor(base * Math.pow(1.15, count));
+    function phaseCostMultiplier(){ const p=gamePhase(); return p==='early'?1.06: p==='mid'?0.90: 1.10; }
+    const itemCost = (base, count) => Math.floor(scaleBase(base, count) * phaseCostMultiplier());
+
+    function getBaseCps(o){ return BASE_UPGRADES.reduce((s,u)=> s + (o[u.id]||0)*u.baseCps, 0); }
+    function applySynergy(cps){ let x=cps; for(const s of SYNERGIES) if (s.cond(state.owned)) x=s.apply(x); return x; }
+
+    function isBuffActive(){ const b=state.activeBuff; return !!(b && (!b.until || Date.now() < b.until)); }
+    function buffRemainingMs(){ const b=state.activeBuff; if(!b||!b.until) return 0; return Math.max(0, b.until - Date.now()); }
+
+    function applyMultipliers(cps){ return cps * state.prestige.mult * state.permMult; }
+    function applyBuff(cps){ if(!isBuffActive()) return cps; const b=state.activeBuff; return (b.mult?cps*b.mult:cps); }
+    function totalCps(){ const base=applySynergy(getBaseCps(state.owned)); return applyBuff(applyMultipliers(base)); }
+    function clickPowerNow(){ const b=isBuffActive()?state.activeBuff:null; return state.clickPower + (b?.addClick||0); }
+
+    function save(){ try{ state.savedAt=Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ console.warn('save failed', e); } }
+    function load(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if (!raw){ return; } const data=JSON.parse(raw)||{}; state={...state, ...data}; }catch(e){ console.warn('load failed', e); } }
+
+    // ===== Buff UI & Control =====
+    let _buffAnimReq = null;
+    function renderBuffPill(){ const el=$('#buffPill'); if(!el) return; if(!isBuffActive()){ el.style.display='none'; el.style.background=''; el.textContent=''; return; } const rem=buffRemainingMs(); const pct = rem/BUFF_DURATION_MS; const deg = Math.max(0, Math.min(360, Math.round(360*pct))); const secs=Math.ceil(rem/1000); const b=state.activeBuff; const label=(b.type==='cpsx2')? 'x2 VPS' : ('+'+(b.addClick||0)+' bulaş'); el.style.display='inline-flex'; el.textContent = `Buff: ${label} • ${secs}s`; el.style.background = `conic-gradient(var(--ring) ${deg}deg, #1f293780 0), #0ea5e980`; }
+    function animateBuff(){ renderBuffPill(); if(isBuffActive()){ _buffAnimReq = requestAnimationFrame(animateBuff); } else { _buffAnimReq=null; }}
+    function startBuff(kind){ const now=Date.now(); const mult = kind==='cpsx2'?2:1; const addClick = kind==='click+50'?50:0; state.activeBuff={ type:kind, started:now, until: now + BUFF_DURATION_MS, mult, addClick }; state.stats.gold++; renderBuffPill(); if(!_buffAnimReq) requestAnimationFrame(animateBuff); renderStats(); save(); }
+
+    // ===== Render =====
+    function updateTexts(){ const L = I18N[state.lang] || I18N.tr; setText('#labelCookies', L.cookies); setText('#labelProduction', L.production); setText('#labelClickUps', L.clickUps); setText('#labelQuests', L.quests); setText('#labelAchievements', L.ach); setText('#resetBtn', L.reset); setText('#prestigeBtn', L.prestige); }
+    function renderStats(){ const cps=totalCps(); setText('#cookies', fmt(state.cookies)); setText('#total', (state.lang==='tr'?'Toplam: ':'Total: ')+fmt(state.totalCookies)); setText('#cpsPill', 'VPS: '+cps.toFixed(1)); setText('#clickTag', '+'+clickPowerNow()+' / '+(state.lang==='tr'?'bulaş':'spread')); setText('#statClicks', fmt(state.stats.clicks)); setText('#statGold', state.stats.gold); renderBuffPill(); $('#prestigeBtn').style.display = canPrestige()? 'inline-flex':'none'; }
+
+    function renderShop(){ const wrap=$('#shop'); if(!wrap) return; wrap.innerHTML=''; BASE_UPGRADES.forEach(u=>{ const count=state.owned[u.id]||0; const cost=itemCost(u.baseCost, count); const afford=state.cookies>=cost; const div=document.createElement('div'); div.className='shop-item'+(afford?'':' disabled'); div.dataset.id=u.id; div.dataset.type='prod'; div.dataset.cost=String(cost); div.innerHTML=`<div class="row" style="gap:10px"><div style="font-size:22px">${u.icon}</div><div><div style="font-weight:800">${u.name} <span class="muted">x${count}</span></div><div class="muted" style="font-size:12px">${u.desc}</div></div></div><div style="text-align:right"><div style="font-weight:800">${fmt(cost)} 🧫</div><div class="muted" style="font-size:10px">+${u.baseCps} VPS</div></div>`; wrap.appendChild(div); }); }
+
+    function renderClickShop(){ const wrap=$('#clickShop'); if(!wrap) return; wrap.innerHTML=''; const available=[], bought=[]; CLICK_UPGRADES.forEach(u=>{ (state.purchased[u.id]? bought : available).push(u); }); const phase=gamePhase(); function addAvail(u){ const price=Math.floor(u.baseCost * (phase==='early'?1.08: phase==='mid'?0.92: 1.1)); const afford=state.cookies>=price; const div=document.createElement('div'); div.className='shop-item'+(afford?'':' disabled'); div.dataset.id=u.id; div.dataset.type='click'; div.dataset.price=String(price); div.innerHTML=`<div><div style="font-weight:800">${u.name}</div><div class="muted" style="font-size:12px">${u.desc}</div></div><div style="text-align:right"><div style="font-weight:800">${fmt(price)} 🧫</div><div class="muted" style="font-size:10px">Tek seferlik</div></div>`; wrap.appendChild(div); } available.forEach(addAvail); if(bought.length){ const sep=document.createElement('div'); sep.className='muted'; sep.style.margin='6px 0'; sep.textContent= state.lang==='tr'?'— Satın Alınanlar —':'— Purchased —'; wrap.appendChild(sep); bought.forEach(u=>{ const div=document.createElement('div'); div.className='shop-item disabled purchased'; div.dataset.id=u.id; div.dataset.type='click'; div.innerHTML=`<div><div style="font-weight:800">${u.name} <span class="badge">${state.lang==='tr'?'Satın alındı':'Owned'}</span></div><div class="muted" style="font-size:12px">${u.desc}</div></div><div style="text-align:right"><div class="muted" style="font-size:12px">✔</div></div>`; if(state.ui && state.ui.lastBoughtClick===u.id){ div.classList.add('boughtFlash'); setTimeout(()=>{ if(state.ui) state.ui.lastBoughtClick=null; }, 600); } wrap.appendChild(div); }); } }
+
+    function renderAchievements(){ const wrap=$('#achievements'); if(!wrap) return; wrap.innerHTML=''; const total = ACHIEVEMENTS_DEF.length; let doneCount = 0; const header = document.createElement('div'); header.className = 'muted'; wrap.appendChild(header); ACHIEVEMENTS_DEF.forEach(a=>{ const done = !!a.done(state); if(done) doneCount++; const d=document.createElement('div'); d.className='achv ach-item'+(done?'':' locked'); d.innerHTML=`<span>${done?'✅':'🔒'}</span><div><div style="font-weight:800">${a.name}</div><div class="muted" style="font-size:12px">${a.desc}</div></div>`; wrap.appendChild(d); }); const pct = Math.round((doneCount/total)*100); header.textContent = (state.lang==='tr' ? `Başarımlar: ${doneCount}/${total} (%${pct})` : `Achievements: ${doneCount}/${total} (${pct}%)`); }
+
+    function applyQuestReward(qid){ const q=QUESTS_DEF.find(x=>x.id===qid); if(!q || !q.reward) return; try{ q.reward(); }catch(e){ console.warn('reward error',e); } }
+    function renderQuests(){ const wrap=$('#quests'); if(!wrap) return; wrap.innerHTML=''; QUESTS_DEF.forEach(q=>{ const was=!!state.quests[q.id]; const done=q.done(state); if(done && !was){ state.quests[q.id]=true; applyQuestReward(q.id); save(); renderStats(); } const d=document.createElement('div'); d.className='quest'; d.innerHTML=`<span>${done?'✅':'🕒'}</span><div><div style="font-weight:800">${q.name}</div><div class="muted" style="font-size:12px">Ödül: ${q.rewardDesc}${was?' • (Alındı)':''}</div></div>`; wrap.appendChild(d); }); }
+
+    function renderAll(){
+      updateTexts();
+      try{ renderStats(); }catch(e){ console.error('renderStats', e); }
+      try{ renderShop(); }catch(e){ console.error('renderShop', e); }
+      try{ renderClickShop(); }catch(e){ console.error('renderClickShop', e); }
+      try{ renderAchievements(); }catch(e){ console.error('renderAchievements', e); }
+      try{ renderQuests(); }catch(e){ console.error('renderQuests', e); }
+    }
+
+    // ===== Gameplay =====
+    function canPrestige(){ return state.totalCookies >= 100000; }
+    function prestigeGain(){ return Math.floor(Math.sqrt(state.totalCookies/100000)); }
+    function doPrestige(){ const L=(I18N[state.lang]||I18N.tr); if(!confirm(L.confirmPrestige)) return; const gain=prestigeGain(); if(gain<=0) return; state.prestige.sugar=(state.prestige.sugar||0)+gain; state.prestige.mult=1 + state.prestige.sugar*0.01; state.cookies=0; state.totalCookies=0; state.clickPower=1; state.owned={}; state.purchased={}; state.stats={clicks:0,gold:0}; state.activeBuff=null; state.permMult=1; state.quests={}; save(); renderAll(); }
+
+    function hardReset(opts={}){ const skipConfirm = !!opts.skipConfirm; const L=(I18N[state.lang]||I18N.tr); if(!skipConfirm){ if(!confirm(L.confirmReset || 'Silinsin mi?')) return false; } try{ localStorage.removeItem(STORAGE_KEY); }catch(e){} state={ cookies:0,totalCookies:0,clickPower:1,owned:{},purchased:{},savedAt:null, stats:{clicks:0,gold:0}, lang:state.lang, prestige:{ sugar:0, mult:1 }, permMult:1, activeBuff:null, quests:{}, ui:{} }; save(); renderAll(); return true; }
+
+    function clickCookie(ev){ const add=clickPowerNow(); state.cookies+=add; state.totalCookies+=add; state.stats.clicks++; if(navigator.vibrate) try{navigator.vibrate(6);}catch(_){} const x=ev?.clientX ?? (innerWidth/2), y=ev?.clientY ?? (innerHeight/2); const s=document.createElement('span'); s.className='float'; s.style.left=x+'px'; s.style.top=y+'px'; s.textContent='+'+add; document.body.appendChild(s); setTimeout(()=>s.remove(),700); renderStats(); if(!isInteractingShop){ renderShop(); renderClickShop(); } save(); }
+
+    function buyProd(u){ const count=state.owned[u.id]||0; const cost=itemCost(u.baseCost, count); if(state.cookies>=cost){ state.cookies-=cost; state.owned[u.id]=count+1; renderAll(); save(); } else { const wrap=$('#shop'); const el = wrap?.querySelector(`.shop-item[data-id="${u.id}"]`); if(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); } } }
+
+    function buyClickUp(u, price){ if(state.purchased[u.id]) return; const p=price??u.baseCost; if(state.cookies>=p){ state.cookies-=p; state.purchased[u.id]=true; state.clickPower+=u.clickAdd; state.ui.lastBoughtClick = u.id; renderAll(); save(); showToast((state.lang==='tr'? 'Satın alındı: ':'Purchased: ')+u.name+' (+'+u.clickAdd+' '+(state.lang==='tr'?'bulaş':'click')+')'); } else { const wrap=$('#clickShop'); const el = wrap?.querySelector(`.shop-item[data-id="${u.id}"]`); if(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); } } }
+
+    // ===== Self Tests =====
+    function runSelfTests(){ const tests=[]; const eq=(n,a,b)=>tests.push({name:n,pass:a===b,got:a,exp:b}); const ok=(n,c)=>tests.push({name:n,pass:!!c,got:c,exp:true});
+      eq('scaleBase(100,0)', scaleBase(100,0), 100);
+      eq('scaleBase(100,1)', scaleBase(100,1), 115);
+      ok('resetBtn exists', !!document.getElementById('resetBtn'));
+      eq('resetBtn type button', (document.getElementById('resetBtn').getAttribute('type')||'button'), 'button');
+      (function(){ let threw=false; try{ renderStats(); }catch(e){ threw=true; } ok('renderStats no throw', !threw); })();
+      (function(){ renderAchievements(); const cnt = document.querySelectorAll('#achievements .ach-item').length; eq('achievements count equals def', cnt, ACHIEVEMENTS_DEF.length); })();
+      (function(){ renderShop(); renderClickShop(); const s1 = document.querySelectorAll('#shop .shop-item').length; const s2 = document.querySelectorAll('#clickShop .shop-item').length; eq('shop count equals BASE_UPGRADES', s1, BASE_UPGRADES.length); eq('clickShop count equals CLICK_UPGRADES', s2, CLICK_UPGRADES.length); })();
+      (function(){ const btn=document.getElementById('cookieBtn'); const before=state.totalCookies; handleCookieKeydown({ code:'Space', key:' ', repeat:true, preventDefault:()=>{}, currentTarget:btn }); const after=state.totalCookies; ok('hold Space no increment', before===after); })();
+      console.group('%cViral Lab+ Classic Self Tests','color:#22c55e;font-weight:bold'); let passAll = true; tests.forEach((t)=>{ if(t.pass){ console.log('✅', t.name); } else { passAll=false; console.error('❌', t.name, 'got:', t.got, 'expected:', t.exp); } }); console.groupEnd(); return passAll; }
+
+    // ===== DOM Ready & Handlers =====
+    function onReady(fn){ if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', fn, {once:true}); } else { fn(); } }
+
+    function handleCookieKeydown(e){ const isSpace=(e.code==='Space'||e.key===' '||e.key==='Spacebar'); const isEnter=(e.code==='Enter'||e.key==='Enter'); if(!(isSpace||isEnter)) return; if(e.repeat){ e.preventDefault(); return; } const r = e.currentTarget.getBoundingClientRect(); clickCookie({ clientX: r.left + r.width/2, clientY: r.top + r.height/2 }); e.preventDefault(); }
+
+    onReady(()=>{
+      load();
+      updateTexts();
+      renderAll();
+
+      const cookieBtn = document.getElementById('cookieBtn');
+      if(cookieBtn){ cookieBtn.addEventListener('click', e=>clickCookie(e)); cookieBtn.addEventListener('keydown', handleCookieKeydown); cookieBtn.addEventListener('keyup', e=>{ const isSpace=(e.code==='Space'||e.key===' '||e.key==='Spacebar'); const isEnter=(e.code==='Enter'||e.key==='Enter'); if(isSpace||isEnter) e.preventDefault(); }); }
+      const resetBtn = document.getElementById('resetBtn');
+      if(resetBtn){ resetBtn.addEventListener('click', ()=>{ hardReset(); }); }
+      const prestigeBtn = document.getElementById('prestigeBtn');
+      if(prestigeBtn){ prestigeBtn.addEventListener('click', doPrestige); }
+      const exportBtn = document.getElementById('exportBtn');
+      if(exportBtn){ exportBtn.addEventListener('click', ()=>{ save(); const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='viral-lab-save.json'; a.click(); URL.revokeObjectURL(a.href); alert('Dışa aktarıldı'); }); }
+      const importInput = document.getElementById('importInput');
+      if(importInput){ importInput.addEventListener('change', e=>{ const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); state={...state, ...data}; renderAll(); save(); }catch(err){ alert('İçe aktarma hatası'); } }; r.readAsText(f); e.target.value=''; }); }
+      const langBtn = document.getElementById('langBtn');
+      if(langBtn){ langBtn.addEventListener('click', ()=>{ state.lang=(state.lang==='tr'?'en':'tr'); updateTexts(); renderStats(); }); }
+
+      // Delegated clicks + interaction lock
+      const shopWrap = document.getElementById('shop');
+      if(shopWrap){
+        shopWrap.addEventListener('pointerdown', ()=>{ isInteractingShop = true; });
+        shopWrap.addEventListener('pointerup',   ()=>{ setTimeout(()=>{ isInteractingShop = false; }, 120); });
+        shopWrap.addEventListener('click', (e)=>{
+          const el = e.target.closest('.shop-item');
+          if(!el || el.classList.contains('disabled')) return;
+          const u = BASE_UPGRADES.find(x=>x.id === el.dataset.id);
+          if(u) buyProd(u);
+        });
+      }
+      const clickWrap = document.getElementById('clickShop');
+      if(clickWrap){
+        clickWrap.addEventListener('pointerdown', ()=>{ isInteractingShop = true; });
+        clickWrap.addEventListener('pointerup',   ()=>{ setTimeout(()=>{ isInteractingShop = false; }, 120); });
+        clickWrap.addEventListener('click', (e)=>{
+          const el = e.target.closest('.shop-item');
+          if(!el || el.classList.contains('disabled')) return;
+          const u = CLICK_UPGRADES.find(x=>x.id === el.dataset.id);
+          if(!u) return;
+          const price = Number(el.dataset.price) || u.baseCost;
+          buyClickUp(u, price);
+        });
+      }
+
+      // Passive income tick & shop rerender
+      setInterval(()=>{ const cps=totalCps(); if(cps>0){ const add=cps/10; state.cookies+=add; state.totalCookies+=add; renderStats(); if(!isInteractingShop){ renderShop(); renderClickShop(); } save(); } else { renderBuffPill(); } }, 100);
+
+      // Random golden event spawner
+      let golden=null; 
+      function maybeSpawnGolden(){ if(golden) return; if(Math.random()<0.25){ const x=10+Math.random()*80, y=20+Math.random()*60; const kind=Math.random()<0.5?'cpsx2':'click+50'; golden={x,y,until:Date.now()+8000}; const btn=document.createElement('button'); btn.className='golden'; btn.style.left=x+'vw'; btn.style.top=y+'vh'; btn.textContent='✨ '+(kind==='cpsx2'?'x2 VPS':'+'+50+' bulaş'); btn.onclick=()=>{ startBuff(kind); golden=null; btn.remove(); }; document.body.appendChild(btn); const t=setInterval(()=>{ if(!golden || Date.now()>golden.until){ clearInterval(t); if(btn.isConnected) btn.remove(); golden=null; } },200); } }
+      setInterval(maybeSpawnGolden, 12000);
+
+      // Background animation
+      (function(){ const canvas=document.getElementById('bgCanvas'); if(!canvas) return; const ctx=canvas.getContext('2d'); let w,h; const DPR=window.devicePixelRatio||1; function resize(){ w=canvas.width=innerWidth*DPR; h=canvas.height=innerHeight*DPR; canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px'; } const microbes=[]; const N=60; function spawn(){ microbes.length=0; for(let i=0;i<N;i++){ microbes.push({x:Math.random()*w, y:Math.random()*h, r:8+Math.random()*14, vx:(Math.random()-0.5)*0.2*DPR, vy:(Math.random()-0.5)*0.2*DPR, wob:Math.random()*6.28}); } } function drawMicrobe(m){ ctx.save(); ctx.translate(m.x,m.y); ctx.rotate(Math.sin(m.wob)*0.4); ctx.fillStyle='rgba(34,197,94,0.12)'; ctx.strokeStyle='rgba(34,197,94,0.5)'; ctx.lineWidth=2*DPR; ctx.beginPath(); ctx.ellipse(0,0,m.r*DPR,m.r*0.7*DPR,0,0,Math.PI*2); ctx.fill(); ctx.stroke(); for(let a=0;a<8;a++){ const ang=a*(Math.PI/4); const sx=Math.cos(ang)*(m.r*1.1*DPR); const sy=Math.sin(ang)*(m.r*1.1*DPR); ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx*1.2, sy*1.2); ctx.stroke(); } ctx.restore(); } function tick(){ ctx.clearRect(0,0,w,h); for(const m of microbes){ m.x+=m.vx; m.y+=m.vy; m.wob+=0.01; if(m.x<-20) m.x=w+20; if(m.x>w+20) m.x=-20; if(m.y<-20) m.y=h+20; if(m.y>h+20) m.y=-20; drawMicrobe(m);} requestAnimationFrame(tick);} resize(); spawn(); addEventListener('resize', resize); requestAnimationFrame(tick); })();
+
+      // Tests last
+      runSelfTests();
+    });
+  </script>
+</body>
+</html>
